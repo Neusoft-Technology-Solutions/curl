@@ -756,7 +756,6 @@ gtls_connect_step1(struct connectdata *conn,
   switch(SSL_CONN_CONFIG(version)) {
     case CURL_SSLVERSION_SSLv3:
       prioritylist = GNUTLS_CIPHERS ":-VERS-TLS-ALL:+VERS-SSL3.0";
-      sni = false;
       break;
     case CURL_SSLVERSION_DEFAULT:
     case CURL_SSLVERSION_TLSv1:
@@ -1153,8 +1152,8 @@ gtls_connect_step3(struct connectdata *conn,
         return CURLE_SSL_INVALIDCERTSTATUS;
       }
 
-      rc = gnutls_ocsp_resp_get_single(ocsp_resp, 0, NULL, NULL, NULL, NULL,
-                                       &status, NULL, NULL, NULL, &reason);
+      (void)gnutls_ocsp_resp_get_single(ocsp_resp, 0, NULL, NULL, NULL, NULL,
+                                        &status, NULL, NULL, NULL, &reason);
 
       switch(status) {
       case GNUTLS_OCSP_CERT_GOOD:
@@ -1679,7 +1678,6 @@ static int Curl_gtls_shutdown(struct connectdata *conn, int sockindex)
       else if(0 == what) {
         /* timeout */
         failf(data, "SSL shutdown timeout");
-        done = 1;
         break;
       }
       else {
