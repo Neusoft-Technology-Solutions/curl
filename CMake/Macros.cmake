@@ -1,13 +1,27 @@
 #File defines convenience macros for available feature testing
 
+# This function copies all available libs from IN_LIBS to AVAIL_LIBS
+# Available means a given lib is not a cmake build target.
+function(remove_created_libs IN_LIBS AVAIL_LIBS)
+  unset(cleared_)
+  foreach(one_lib_ ${IN_LIBS})
+    if(NOT TARGET ${one_lib_})
+      list(APPEND cleared_ ${one_lib_})
+    endif()
+  endforeach(one_lib_)
+  set(${AVAIL_LIBS} ${cleared_} PARENT_SCOPE)
+endfunction()
+
 # This macro checks if the symbol exists in the library and if it
 # does, it prepends library to the list.  It is intended to be called
 # multiple times with a sequence of possibly dependent libraries in
 # order of least-to-most-dependent.  Some libraries depend on others
 # to link correctly.
 macro(check_library_exists_concat LIBRARY SYMBOL VARIABLE)
-  check_library_exists("${LIBRARY};${CURL_LIBS}" ${SYMBOL} "${CMAKE_LIBRARY_PATH}"
+  remove_created_libs("${LIBRARY};${CURL_LIBS}" CURL_CHECK_LIBS_)
+  check_library_exists("${CURL_CHECK_LIBS_}" ${SYMBOL} "${CMAKE_LIBRARY_PATH}"
     ${VARIABLE})
+  unset(CURL_CHECK_LIBS_)
   if(${VARIABLE})
     set(CURL_LIBS ${LIBRARY} ${CURL_LIBS})
   endif()

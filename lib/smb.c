@@ -34,7 +34,7 @@
 #include <process.h>
 #ifdef CURL_WINDOWS_APP
 #define getpid GetCurrentProcessId
-#elif !defined(MSDOS)
+#elif !defined(MSDOS) && !defined(__QNX__)
 #define getpid _getpid
 #endif
 #endif

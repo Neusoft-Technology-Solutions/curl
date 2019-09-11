@@ -47,7 +47,7 @@ include(CheckCCompilerFlag)
 
 project(CURL C)
 
-message(WARNING "the curl cmake build system is poorly maintained. Be aware")
+#message(WARNING "the curl cmake build system is poorly maintained. Be aware")
 
 file(READ ${CURL_SOURCE_DIR}/include/curl/curlver.h CURL_VERSION_H_CONTENTS)
 string(REGEX MATCH "#define LIBCURL_VERSION \"[^\"]*"
@@ -75,7 +75,7 @@ include_directories(${CURL_SOURCE_DIR}/include)
 option(CURL_WERROR "Turn compiler warnings into errors" OFF)
 option(PICKY_COMPILER "Enable picky compiler options" ON)
 option(BUILD_CURL_EXE "Set to ON to build curl executable." ON)
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+#option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 option(ENABLE_ARES "Set to ON to enable c-ares support" OFF)
 if(WIN32)
   option(CURL_STATIC_CRT "Set to ON to build libcurl with static CRT on Windows (/MT)." OFF)
@@ -117,9 +117,9 @@ if(ENABLE_CURLDEBUG)
 endif()
 
 # For debug libs and exes, add "-d" postfix
-if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
-  set(CMAKE_DEBUG_POSTFIX "-d")
-endif()
+#if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
+#  set(CMAKE_DEBUG_POSTFIX "-d")
+#endif()
 
 # initialize CURL_LIBS
 set(CURL_LIBS "")
@@ -204,6 +204,7 @@ if(ENABLE_IPV6 AND NOT WIN32)
   endif()
 endif()
 
+if (FALSE)
 curl_nroff_check()
 find_package(Perl)
 
@@ -218,6 +219,7 @@ endif()
 if(ENABLE_MANUAL)
   set(USE_MANUAL ON)
 endif()
+endif(FALSE)
 
 # We need ansi c-flags, especially on HP
 set(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
@@ -346,7 +348,9 @@ if(CMAKE_USE_DARWINSSL)
 endif()
 
 if(CMAKE_USE_OPENSSL)
-  find_package(OpenSSL REQUIRED)
+  if(NOT OPENSSL_FOUND)
+    find_package(OpenSSL REQUIRED)
+  endif()
   set(SSL_ENABLED ON)
   set(USE_OPENSSL ON)
   set(HAVE_LIBCRYPTO ON)
@@ -416,7 +420,7 @@ if(NOT CURL_DISABLE_LDAP)
     check_include_file_concat("winber.h"  HAVE_WINBER_H)
   else()
     # Check for LDAP
-    set(CMAKE_REQUIRED_LIBRARIES ${OPENSSL_LIBRARIES})
+    remove_created_libs(${OPENSSL_LIBRARIES} CMAKE_REQUIRED_LIBRARIES)
     check_library_exists_concat(${CMAKE_LDAP_LIB} ldap_init HAVE_LIBLDAP)
     check_library_exists_concat(${CMAKE_LBER_LIB} ber_init HAVE_LIBLBER)
 
@@ -502,14 +506,16 @@ endif()
 check_library_exists_concat("idn2" idn2_lookup_ul HAVE_LIBIDN2)
 
 # Check for symbol dlopen (same as HAVE_LIBDL)
-check_library_exists("${CURL_LIBS}" dlopen "" HAVE_DLOPEN)
+check_library_exists_concat("" dlopen HAVE_DLOPEN)
 
 option(CURL_ZLIB "Set to ON to enable building curl with zlib support." ON)
 set(HAVE_LIBZ OFF)
 set(HAVE_ZLIB_H OFF)
 set(USE_ZLIB OFF)
 if(CURL_ZLIB)
-  find_package(ZLIB QUIET)
+  if(NOT ZLIB_FOUND)
+    find_package(ZLIB QUIET)
+  endif()
   if(ZLIB_FOUND)
     set(HAVE_ZLIB_H ON)
     set(HAVE_LIBZ ON)
@@ -1278,6 +1284,9 @@ set(REQUIRE_LIB_DEPS        "no")
 # SUPPORT_PROTOCOLS
 set(VERSIONNUM              "${CURL_VERSION_NUM}")
 
+####################################
+if(FALSE) ##########################
+
 # Finally generate a "curl-config" matching this config
 # Use:
 # * ENABLE_SHARED
@@ -1347,3 +1356,7 @@ if(NOT TARGET uninstall)
       COMMAND ${CMAKE_COMMAND} -P
       ${CMAKE_CURRENT_BINARY_DIR}/CMake/cmake_uninstall.cmake)
 endif()
+
+endif(FALSE) ##########################
+####################################
+

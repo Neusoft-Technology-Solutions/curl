@@ -1,9 +1,14 @@
 set(LIB_NAME libcurl)
 
-if(BUILD_SHARED_LIBS)
-  set(CURL_STATICLIB NO)
+#if(BUILD_SHARED_LIBS)
+#  set(CURL_STATICLIB NO)
+#else()
+#  set(CURL_STATICLIB YES)
+#endif()
+if (CURL_STATICLIB)
+  set(BUILD_SHARED_LIBS NO)
 else()
-  set(CURL_STATICLIB YES)
+  set(BUILD_SHARED_LIBS YES)
 endif()
 
 # Use:
