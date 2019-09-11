@@ -24,10 +24,15 @@
 
 #include "curl_setup.h"
 
-#ifdef HAVE_SYS_POLL_H
-#include <sys/poll.h>
-#elif defined(HAVE_POLL_H)
-#include <poll.h>
+#if defined(_WIN32) && (_WIN32_WINNT >= 0x0600)
+   #include <winsock2.h>
+   #define HAVE_STRUCT_POLLFD
+#else
+   #ifdef HAVE_SYS_POLL_H
+      #include <sys/poll.h>
+   #elif defined(HAVE_POLL_H)
+      #include <poll.h>
+   #endif
 #endif
 
 /*

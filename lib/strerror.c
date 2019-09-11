@@ -652,7 +652,7 @@ const char *Curl_strerror(struct connectdata *conn, int err)
 
 #else /* not USE_WINSOCK coming up */
 
-#if defined(HAVE_STRERROR_R) && defined(HAVE_POSIX_STRERROR_R)
+#if defined(__QNX__) || ( defined(HAVE_STRERROR_R) && defined(HAVE_POSIX_STRERROR_R) )
  /*
   * The POSIX-style strerror_r() may set errno to ERANGE if insufficient
   * storage is supplied via 'strerrbuf' and 'buflen' to hold the generated

@@ -102,6 +102,7 @@ target_link_libraries(${LIB_NAME} ${CURL_LIBS})
 
 if(WIN32)
   add_definitions( -D_USRDLL )
+  add_definitions( -DHAVE_IOCTLSOCKET_FIONBIO=1 )
 endif()
 
 set_target_properties(${LIB_NAME} PROPERTIES COMPILE_DEFINITIONS BUILDING_LIBCURL)
