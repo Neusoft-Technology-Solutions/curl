@@ -1391,8 +1391,8 @@ static ssize_t cf_socket_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
 static void conn_set_primary_ip(struct Curl_cfilter *cf,
                                 struct Curl_easy *data)
 {
-  struct cf_socket_ctx *ctx = cf->ctx;
 #ifdef HAVE_GETPEERNAME
+  struct cf_socket_ctx *ctx = cf->ctx;
   char buffer[STRERROR_LEN];
   struct Curl_sockaddr_storage ssrem;
   curl_socklen_t plen;
