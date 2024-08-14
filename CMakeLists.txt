@@ -51,6 +51,10 @@ include(Utilities)
 include(Macros)
 include(CMakeDependentOption)
 include(CheckCCompilerFlag)
+include(CMakePushCheckState)
+
+# clear all try_compile settings
+cmake_reset_check_state()
 
 project(CURL C)
 
@@ -349,7 +353,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES Haiku)
 endif()
 
 # Include all the necessary files for macros
-include(CMakePushCheckState)
 include(CheckFunctionExists)
 include(CheckIncludeFile)
 include(CheckIncludeFiles)
@@ -818,6 +821,7 @@ if(NOT CURL_DISABLE_LDAP)
 
   # Now that we know, we're not using windows LDAP...
   if(NOT USE_WIN32_LDAP)
+    cmake_push_check_state()
     # Check for LDAP
     set(CMAKE_REQUIRED_LIBRARIES ${OPENSSL_LIBRARIES})
     check_library_exists("${CMAKE_LDAP_LIB}" "ldap_init" "" HAVE_LIBLDAP)
@@ -900,6 +904,7 @@ if(NOT CURL_DISABLE_LDAP)
         set(HAVE_LDAP_SSL ON)
       endif()
     endif()
+    cmake_pop_check_state()
   endif()
 endif()
 
@@ -1060,10 +1065,11 @@ if(CURL_USE_GSSAPI)
       endforeach()
 
       if(NOT DEFINED HAVE_GSS_C_NT_HOSTBASED_SERVICE)
+        cmake_push_check_state()
         set(CMAKE_REQUIRED_FLAGS "${_COMPILER_FLAGS_STR} ${_LINKER_FLAGS_STR}")
         set(CMAKE_REQUIRED_LIBRARIES ${GSS_LIBRARIES})
         check_symbol_exists("GSS_C_NT_HOSTBASED_SERVICE" ${_INCLUDE_LIST} HAVE_GSS_C_NT_HOSTBASED_SERVICE)
-        unset(CMAKE_REQUIRED_LIBRARIES)
+        cmake_pop_check_state()
       endif()
       if(NOT HAVE_GSS_C_NT_HOSTBASED_SERVICE)
         set(HAVE_OLD_GSSMIT ON)
@@ -1422,11 +1428,13 @@ foreach(CURL_TEST
   curl_internal_test(${CURL_TEST})
 endforeach()
 
+cmake_push_check_state(RESET)
 if(HAVE_FILE_OFFSET_BITS)
   set(_FILE_OFFSET_BITS 64)
   set(CMAKE_REQUIRED_FLAGS "-D_FILE_OFFSET_BITS=64")
 endif()
 check_type_size("off_t"  SIZEOF_OFF_T)
+cmake_pop_check_state()
 
 # fseeko may not exist with _FILE_OFFSET_BITS=64 but can exist with
 # _FILE_OFFSET_BITS unset or 32 (e.g. Android ARMv7 with NDK 26b and API level < 24)
@@ -1438,12 +1446,14 @@ if(HAVE_FSEEKO)
 endif()
 
 # include this header to get the type
+cmake_push_check_state(RESET)
 set(CMAKE_REQUIRED_INCLUDES "${CURL_SOURCE_DIR}/include")
 set(CMAKE_EXTRA_INCLUDE_FILES "curl/system.h")
 check_type_size("curl_off_t"  SIZEOF_CURL_OFF_T)
 set(CMAKE_EXTRA_INCLUDE_FILES "curl/curl.h")
 check_type_size("curl_socket_t"  SIZEOF_CURL_SOCKET_T)
 set(CMAKE_EXTRA_INCLUDE_FILES "")
+cmake_pop_check_state()
 
 if(NOT WIN32 AND NOT CMAKE_CROSSCOMPILING)
   # on not-Windows and not-crosscompiling, check for writable argv[]
