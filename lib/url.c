@@ -1721,9 +1721,9 @@ static void zonefrom_url(CURLU *uh, struct Curl_easy *data,
 {
   char *zoneid;
   CURLUcode uc = curl_url_get(uh, CURLUPART_ZONEID, &zoneid, 0);
-#ifdef CURL_DISABLE_VERBOSE_STRINGS
+//#ifdef CURL_DISABLE_VERBOSE_STRINGS
   (void)data;
-#endif
+//#endif
 
   if(!uc && zoneid) {
     char *endp;
